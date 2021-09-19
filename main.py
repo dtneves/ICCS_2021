@@ -102,6 +102,7 @@ from GAIN.gain import gain
 from GAIN.utils import rmse_loss
 
 from purify.imputation.gain import SGAIN, WSGAIN_CP, WSGAIN_GP
+from purify.preprocessing import DataTransformer
 
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import LabelEncoder
@@ -571,12 +572,17 @@ DATASETS: Dict[str, Dict[str, Any]] = {
 
 def accuracy_and_auroc(
         algo: str, model: BaseEstimator, original_data: np.ndarray, imputed_data: np.ndarray, target: np.ndarray,
-        verbose: bool = False) -> Tuple[float, float]:
+        discrete_columns: List[int], verbose: bool = False) -> Tuple[float, float]:
     score_accuracy: float = 0
     score_auroc: float = 0
-    scaler: MinMaxScaler = MinMaxScaler(feature_range=((0.00, 1.00) if algo == 'GAIN' else (-1.00, +1.00)))
-    original: np.ndarray = scaler.fit_transform(X=original_data.copy())
-    imputed:  np.ndarray = scaler.transform(X=imputed_data)
+
+    pd.DataFrame(original_data).describe()
+    pd.DataFrame(imputed_data).describe()
+
+    original_transformer: DataTransformer = DataTransformer()
+    imputed_transformer: DataTransformer = DataTransformer()
+    original: np.ndarray = original_transformer.fit_transform(original_data.copy(), discrete_columns=discrete_columns)
+    imputed:  np.ndarray = imputed_transformer.fit_transform(imputed_data, discrete_columns=discrete_columns)
 
     model.fit(X=original, y=target)
     score_accuracy = accuracy_score(y_true=target, y_pred=model.predict(X=imputed))
@@ -681,13 +687,16 @@ def main(args: Namespace) -> None:
             # data, miss, mask, trgt = matrices_and_target(dataset=args.dataset, miss_rate=args.miss_rate)
             df = pd.read_csv(f"./datasets/{dataset}.csv")
             df[DATASETS[dataset]["target"]] = LabelEncoder().fit_transform(df[DATASETS[dataset]["target"]])
+            discrete_columns = [df.columns.get_loc(column_name)
+                                for column_name in list(DATASETS[dataset]['categorical_vars'].keys())]
 
             for algo in algos:
                 t0 = time()
                 if algo in ['SGAIN', 'WSGAIN-CP', 'WSGAIN-GP']:
                     imputed_data = callables[algo](
                         data=miss,
-                        algo_parameters={key.strip(): value for key, value in args.__dict__.items()}).execute()
+                        algo_parameters={key.strip(): value for key, value in args.__dict__.items()},
+                        discrete_columns=discrete_columns).execute()
                 else:  # if algo in ['GAIN']:
                     imputed_data = callables[algo](
                         data_x=miss, gain_parameters={key.strip(): value for key, value in args.__dict__.items()})
@@ -700,6 +709,7 @@ def main(args: Namespace) -> None:
                     algo=algo,
                     model=model,
                     original_data=data, imputed_data=imputed_data, target=df[DATASETS[dataset]["target"]],
+                    discrete_columns=discrete_columns,
                     verbose=False)
                 results[dataset][algo]['accuracy_lst'].append(score_accuracy)
                 results[dataset][algo]['auroc_lst'].append(score_auroc)

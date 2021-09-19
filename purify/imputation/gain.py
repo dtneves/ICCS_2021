@@ -114,10 +114,11 @@ from sklearn.preprocessing import MinMaxScaler
 
 from GAIN.utils import sample_batch_index, rounding
 
+from purify.preprocessing import DataTransformer
+
 from tqdm import tqdm
 
 from typing import Any, Dict, List, Tuple
-
 
 tf.compat.v1.disable_v2_behavior()
 
@@ -130,10 +131,11 @@ class SGAIN:
             "SGAIN, WSGAIN-CP and WSGAIN-GP: Novel GAN Methods for Missing Data Imputation,"
             International Conference on Computational Science (ICCS), 2021.
     """
-    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
-        self.scaler: MinMaxScaler = MinMaxScaler(feature_range=(-1.00, +1.00))
+
+    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any], discrete_columns: List[int] = None):
+        self.transformer = DataTransformer()
         self.data: np.ndarray = data.copy()
-        self.data_miss: np.ndarray = self.scaler.fit_transform(X=self.data)
+        self.data_miss: np.ndarray = self.transformer.fit_transform(self.data, discrete_columns=discrete_columns)
         self.data_mask: np.ndarray = 1 - np.isnan(self.data)
         self.n_obs: int = self.data.shape[0]
         self.m_dim: int = self.data.shape[1]
@@ -154,6 +156,25 @@ class SGAIN:
         self.data_miss = np.nan_to_num(x=self.data_miss, nan=0.00)
         # build the Generative Adversarial Network (GAN) architecture
         self.gan_architecture()
+
+    def _apply_activations(self, x):
+        data_t = []
+        st = 0
+
+        for item in self.transformer.output_info:
+            item = item['output_info'][0]
+            if item[1] == 'tanh':
+                ed = st + item[0]
+                data_t.append(tf.keras.activations.tanh(x[:, st:ed]))
+                st = ed
+            elif item[1] == 'softmax':
+                ed = st + item[0]
+                data_t.append(tf.keras.activations.softmax(x[:, st:ed]))
+                st = ed
+            else:
+                assert 0
+
+        return tf.concat(data_t, axis=1)
 
     def gan_architecture(self) -> None:
         self.X: Tensor = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.m_dim])  # data Tensor
@@ -218,12 +239,14 @@ class SGAIN:
     def generator(self, z: Tensor, m: Tensor) -> Tensor:
         G_h1: Tensor = tf.nn.relu(features=(tf.matmul(a=tf.concat(values=[z, m], axis=1), b=self.G_W1) + self.G_b1))
 
-        return tf.nn.tanh(x=(tf.matmul(a=G_h1, b=self.G_W2) + self.G_b2))  # returns `G_prob`, which is a Tensor
+        return self._apply_activations(
+            (tf.matmul(a=G_h1, b=self.G_W2) + self.G_b2))  # returns `G_prob`, which is a Tensor
 
     def discriminator(self, x: Tensor) -> Tensor:
         D_h1: Tensor = tf.nn.relu(features=(tf.matmul(a=x, b=self.D_W1) + self.D_b1))
 
-        return tf.nn.tanh(x=(tf.matmul(a=D_h1, b=self.G_W2) + self.G_b2))  # returns `D_prob`, which is a Tensor
+        return self._apply_activations(
+            x=(tf.matmul(a=D_h1, b=self.G_W2) + self.G_b2))  # returns `D_prob`, which is a Tensor
 
     @staticmethod
     def sample_z(n_rows: int, m_cols: int, feature_range: Tuple[float, float] = (-0.01, +0.01)) -> np.ndarray:
@@ -235,8 +258,8 @@ class SGAIN:
         imputed_data: np.ndarray = sess.run(
             fetches=[self.G_sample], feed_dict={self.M: self.data_mask, self.Z: Z_all})[0]
 
-        imputed_data = self.scaler.inverse_transform(
-            X=(self.data_mask * self.data_miss + (1 - self.data_mask) * imputed_data))
+        imputed_data = self.transformer.inverse_transform(
+            data=(self.data_mask * self.data_miss + (1 - self.data_mask) * imputed_data))
         imputed_data = rounding(imputed_data=imputed_data, data_x=self.data)
 
         return imputed_data
@@ -288,6 +311,7 @@ class WSGAIN(SGAIN):
             "SGAIN, WSGAIN-CP and WSGAIN-GP: Novel GAN Methods for Missing Data Imputation,"
             International Conference on Computational Science (ICCS), 2021.
     """
+
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
         super().__init__(data=data, algo_parameters=algo_parameters)
         # NOTE: THIS DIVISION IS AN HACK TO PROMOTE FAIR COMPARISONS AS EXPLAINED IN THE ICCS 2021 PAPER,
@@ -318,6 +342,7 @@ class WSGAIN_CP(WSGAIN):
             "SGAIN, WSGAIN-CP and WSGAIN-GP: Novel GAN Methods for Missing Data Imputation,"
             International Conference on Computational Science (ICCS), 2021.
     """
+
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
         super().__init__(data=data, algo_parameters=algo_parameters)
         # some refinement needs to be introduced into the GAN architecture due to the clipping penalty
@@ -377,6 +402,7 @@ class WSGAIN_GP(WSGAIN):
             "SGAIN, WSGAIN-CP and WSGAIN-GP: Novel GAN Methods for Missing Data Imputation,"
             International Conference on Computational Science (ICCS), 2021.
     """
+
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
         super().__init__(data=data, algo_parameters=algo_parameters)
         self.lambd: float = algo_parameters['lambd'] if 'lambd' in algo_parameters else 10
@@ -427,4 +453,3 @@ class WSGAIN_GP(WSGAIN):
                            f"D loss: {D_loss_curr:.4}; G_loss: {G_loss_curr:.4}; MSE_loss: {MSE_loss_curr:.4}")
 
         return self.impute(sess=sess)
-
