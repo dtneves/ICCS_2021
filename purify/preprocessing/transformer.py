@@ -104,6 +104,7 @@ class DataTransformer:
             else:
                 inverted = self._inverse_transform_discrete(info, columns_data)
 
+            n_unique = np.unique(inverted)
             output.append(inverted)
             start += dimensions
 

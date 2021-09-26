@@ -97,6 +97,8 @@ import numpy as np
 
 import pandas as pd
 
+from ctgan import CTGANSynthesizer
+
 from GAIN.data_loader import data_loader
 from GAIN.gain import gain
 from GAIN.utils import rmse_loss
@@ -642,13 +644,13 @@ def report(args: Namespace,
 
 def main(args: Namespace) -> None:
     algos: List[str] = [algo.strip() for algo in args.algos.split(',')]
-    algos_set: Set[str] = set(['GAIN', 'SGAIN', 'WSGAIN-CP', 'WSGAIN-GP'])              # TODO: GET RID OF HARDCODED
+    algos_set: Set[str] = set(['GAIN', 'SGAIN', 'WSGAIN-CP', 'WSGAIN-GP', 'CTGAN'])  # TODO: GET RID OF HARDCODED
     datasets: List[str] = [dataset.strip() for dataset in args.datasets.split(',')]
     datasets_set: Set[str] = set(
         ['breast', 'credit', 'eeg', 'iris', 'letter', 'mushroom_lb',  # TODO: GET RID OF HARDCODED
          'news', 'spam', 'wine-red', 'wine-white', 'yeast'])  # TODO: GET RID OF HARDCODED
     callables: Dict[str, Callable[[Namespace, Tuple[int, int], Dict[str, Any]], np.ndarray]] = {
-        'GAIN': gain, 'SGAIN': SGAIN, 'WSGAIN-CP': WSGAIN_CP, 'WSGAIN-GP': WSGAIN_GP}   # TODO: GET RID OF HARDCODED
+        'GAIN': gain, 'SGAIN': SGAIN, 'WSGAIN-CP': WSGAIN_CP, 'WSGAIN-GP': WSGAIN_GP, 'CTGAN': CTGANSynthesizer}  # TODO: GET RID OF HARDCODED
     results: Dict[str, Dict[str, Dict[str, List[Union[np.ndarray, float]]]]]
 
     if algos == ['ALL']:
@@ -699,7 +701,18 @@ def main(args: Namespace) -> None:
                         data=miss,
                         algo_parameters={key.strip(): value for key, value in args.__dict__.items()},
                         discrete_columns=discrete_columns).execute()
-                else:  # if algo in ['GAIN']:
+                elif algo in ['CTGAN']:
+                    if DATASETS[dataset]['categorical_vars']:
+                        discrete_columns = list(DATASETS[dataset]['categorical_vars'].keys())
+
+                    df_original = df.drop([DATASETS[dataset]["target"]], axis=1)
+                    ctgan_synth = callables[algo](
+                        epochs=1000
+                    )
+                    ctgan_synth.fit(df_original, discrete_columns)
+                    sampled = ctgan_synth.sample(df.shape[0]).values
+                    imputed_data = mask * np.nan_to_num(x=miss, nan=0.00) + (1 - mask) * sampled
+                else:  # if algo in ['GAIN']
                     imputed_data = callables[algo](
                         data_x=miss, gain_parameters={key.strip(): value for key, value in args.__dict__.items()})
                 t1 = time()
