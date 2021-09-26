@@ -133,8 +133,8 @@ class SGAIN:
     """
 
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any], discrete_columns: List[int] = None):
-        self.transformer = DataTransformer()
         self.data: np.ndarray = data.copy()
+        self.transformer = DataTransformer()
         self.data_miss: np.ndarray = self.transformer.fit_transform(self.data, discrete_columns=discrete_columns)
         self.data_mask: np.ndarray = 1 - np.isnan(self.data_miss)
         self.n_obs: int = self.data_miss.shape[0]
@@ -161,7 +161,7 @@ class SGAIN:
         data_t = []
         st = 0
 
-        for item in self.transformer.output_info:
+        for idx, item in enumerate(self.transformer.output_info):
             item = item['output_info'][0]
             if item[1] == 'tanh':
                 ed = st + item[0]
@@ -169,7 +169,8 @@ class SGAIN:
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                data_t.append(tf.keras.activations.softmax(x[:, st:ed]))
+                c = tf.keras.activations.softmax(x[:, st:ed])
+                data_t.append(c)
                 st = ed
             else:
                 assert 0
@@ -260,7 +261,7 @@ class SGAIN:
 
         imputed_data = self.transformer.inverse_transform(
             data=(self.data_mask * self.data_miss + (1 - self.data_mask) * imputed_data))
-        imputed_data = rounding(imputed_data=imputed_data, data_x=self.data)
+        # imputed_data = rounding(imputed_data=imputed_data, data_x=self.data)
 
         return imputed_data
 
@@ -312,8 +313,8 @@ class WSGAIN(SGAIN):
             International Conference on Computational Science (ICCS), 2021.
     """
 
-    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
-        super().__init__(data=data, algo_parameters=algo_parameters)
+    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any], discrete_columns: List[int] = None):
+        super().__init__(data=data, algo_parameters=algo_parameters, discrete_columns=discrete_columns)
         # NOTE: THIS DIVISION IS AN HACK TO PROMOTE FAIR COMPARISONS AS EXPLAINED IN THE ICCS 2021 PAPER,
         #       IT WILL ENSURE THAT THE SUM OF ITERATIONS TO TRAIN THE GENERATOR AND THE CRITIC OF THIS IMPLEMENTATION
         #       IS (APPROXIMATELY) THE SAME OT THE COUNTERPART ONES OF GAIN AND SGAIN
@@ -343,8 +344,8 @@ class WSGAIN_CP(WSGAIN):
             International Conference on Computational Science (ICCS), 2021.
     """
 
-    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
-        super().__init__(data=data, algo_parameters=algo_parameters)
+    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any], discrete_columns: List[int] = None):
+        super().__init__(data=data, algo_parameters=algo_parameters, discrete_columns=discrete_columns)
         # some refinement needs to be introduced into the GAN architecture due to the clipping penalty
         self.refine_gan_architecture(algo_parameters=algo_parameters)
 
@@ -403,8 +404,8 @@ class WSGAIN_GP(WSGAIN):
             International Conference on Computational Science (ICCS), 2021.
     """
 
-    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any]):
-        super().__init__(data=data, algo_parameters=algo_parameters)
+    def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any], discrete_columns: List[int] = None):
+        super().__init__(data=data, algo_parameters=algo_parameters, discrete_columns=discrete_columns)
         self.lambd: float = algo_parameters['lambd'] if 'lambd' in algo_parameters else 10
         # some refinement needs to be introduced into the GAN architecture due to the gradient penalty
         self.refine_gan_architecture(algo_parameters=algo_parameters)

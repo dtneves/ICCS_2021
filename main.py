@@ -119,7 +119,6 @@ from time import time
 
 from typing import Any, Callable, Dict, List, Set, Tuple, Union
 
-
 ########################################################################################################################
 # a few datasets from UCI Machine Learning Repository (https://archive.ics.uci.edu/ml/index.php) and their metadata.
 # the metadata is useful for some basic data preprocessing tasks (e.g., label, ordinal, or
@@ -132,14 +131,14 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Breast Cancer Wisconsin (Diagnostic) Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)",
         "header": [0],
-        "drop_cols": ["ID"],             # columns to drop
-        "categorical_vars": {            # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
-            "Diagnosis": {
-                "class": LabelEncoder,
-                "kwargs": {},
-            }
+        "drop_cols": ["ID"],  # columns to drop
+        "categorical_vars": {  # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
+        #     "Diagnosis": {
+        #         "class": LabelEncoder,
+        #         "kwargs": {},
+        #     }
         },
-        "target": "Diagnosis",           # the  label of the dependent variable (i.e., feature)
+        "target": "Diagnosis",  # the  label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -147,9 +146,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "model": {
             "class": LogisticRegression,
             "kwargs": {
-                "class_weight": None,    # class_weight: dict or ‘balanced’, default=None
-                "max_iter": 3000,        # max_iter: int, default=100
-                "n_jobs": -1             # -1 means using all processors
+                "class_weight": None,  # class_weight: dict or ‘balanced’, default=None
+                "max_iter": 3000,  # max_iter: int, default=100
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -157,9 +156,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Covertype Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/Covertype",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # in this case, for the sake of simplicity we do NOT enumerate the cat. vars.
-        "target": "Cover_Type",          # the  label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # in this case, for the sake of simplicity we do NOT enumerate the cat. vars.
+        "target": "Cover_Type",  # the  label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -167,9 +166,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "model": {
             "class": LogisticRegression,
             "kwargs": {
-                "class_weight": None,    # class_weight: dict or ‘balanced’, default=None
-                "max_iter": 1000,        # max_iter: int, default=100
-                "n_jobs": -1             # -1 means using all processors
+                "class_weight": None,  # class_weight: dict or ‘balanced’, default=None
+                "max_iter": 1000,  # max_iter: int, default=100
+                "n_jobs": -1  # -1 means using all processors
             }
         }
         # "model": {
@@ -187,8 +186,8 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Default of Credit Card Clients Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients",
         "header": [0],
-        "drop_cols": ["ID"],             # columns to drop
-        "categorical_vars": {            # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
+        "drop_cols": ["ID"],  # columns to drop
+        "categorical_vars": {  # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
             "SEX": {
                 "class": OneHotEncoder,
                 "kwargs": {"dtype": int}
@@ -226,7 +225,7 @@ DATASETS: Dict[str, Dict[str, Any]] = {
                 "kwargs": {"dtype": int}
             }
         },
-        "target": "def. pay. n. m.",     # the  label of the dependent variable (i.e., feature)
+        "target": "def. pay. n. m.",  # the  label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -234,9 +233,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "model": {
             "class": LogisticRegression,
             "kwargs": {
-                "class_weight": None,    # class_weight: dict or ‘balanced’, default=None
-                "max_iter": 1200,        # max_iter: int, default=100
-                "n_jobs": -1             # -1 means using all processors
+                "class_weight": None,  # class_weight: dict or ‘balanced’, default=None
+                "max_iter": 1200,  # max_iter: int, default=100
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -244,9 +243,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "EEG Eye State Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/EEG+Eye+State",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "Eye Detection",       # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "Eye Detection",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -255,10 +254,10 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 5,
-                "weights": 'uniform',    # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
-                "algorithm": 'auto',     # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "algorithm": 'auto',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -266,9 +265,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Iris Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/iris",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "class",               # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "class",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -277,10 +276,10 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 5,
-                "weights": 'uniform',    # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
-                "algorithm": 'auto',     # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "algorithm": 'auto',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -288,9 +287,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Letter Recognition Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/letter+recognition",
         "header": [0],
-        "drop_cols": [],                   # columns to drop
-        "categorical_vars": None,          # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "letter",                # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "letter",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -316,19 +315,19 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 10,
-                "weights": 'uniform',      # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
                 "algorithm": 'ball_tree',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                    # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
-    "mushroom": {
+    "mushroom_lb": {
         "name": "Mushroom Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/Mushroom",
         "header": [0],
-        "drop_cols": ["stalk-root"],     # columns to drop
-        "categorical_vars": {            # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
+        "drop_cols": ["stalk-root"],  # columns to drop
+        "categorical_vars": {  # the cat. (i.e., discrete) vars. (i.e., features) that need to be encoded
             "cap-shape": {
                 "class": OneHotEncoder,
                 "kwargs": {"dtype": int}
@@ -366,10 +365,6 @@ DATASETS: Dict[str, Dict[str, Any]] = {
                 "kwargs": {"dtype": int}
             },
             "stalk-shape": {
-                "class": OneHotEncoder,
-                "kwargs": {"dtype": int}
-            },
-            "stalk-root": {
                 "class": OneHotEncoder,
                 "kwargs": {"dtype": int}
             },
@@ -418,7 +413,7 @@ DATASETS: Dict[str, Dict[str, Any]] = {
                 "kwargs": {"dtype": int}
             }
         },
-        "target": "class",               # the label of the dependent variable (i.e., feature)
+        "target": "class",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -435,20 +430,23 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 5,
-                "weights": 'uniform',    # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
-                "algorithm": 'auto',     # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "algorithm": 'auto',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1,  # -1 means using all processors
+                "leaf_size": 30,
+                "metric": 'minkowski',
+                "metric_params": None
             }
         }
     },
-    "news": {                            # PORTUGUESE --> ALGORITMI Research Centre, UMinho, Portugal
+    "news": {  # PORTUGUESE --> ALGORITMI Research Centre, UMinho, Portugal
         "name": "Online News Popularity Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/online+news+popularity",
         "header": [0],
-        "drop_cols": ["url"],            # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "shares",              # the label of the dependent variable (i.e., feature)
+        "drop_cols": ["url"],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "shares",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -456,9 +454,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "model": {
             "class": LogisticRegression,
             "kwargs": {
-                "class_weight": None,    # class_weight: dict or ‘balanced’, default=None
-                "max_iter": 1000,        # max_iter: int, default=100
-                "n_jobs": -1             # -1 means using all processors
+                "class_weight": None,  # class_weight: dict or ‘balanced’, default=None
+                "max_iter": 1000,  # max_iter: int, default=100
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -466,9 +464,9 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "name": "Spambase Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/spambase",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "spam",                # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "spam",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -476,19 +474,19 @@ DATASETS: Dict[str, Dict[str, Any]] = {
         "model": {
             "class": LogisticRegression,
             "kwargs": {
-                "class_weight": None,    # class_weight: dict or ‘balanced’, default=None
-                "max_iter": 2000,        # max_iter: int, default=100
-                "n_jobs": -1             # -1 means using all processors
+                "class_weight": None,  # class_weight: dict or ‘balanced’, default=None
+                "max_iter": 2000,  # max_iter: int, default=100
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
-    "wine-red": {                        # PORTUGUESE --> DSI, UMinho, Portugal
+    "wine-red": {  # PORTUGUESE --> DSI, UMinho, Portugal
         "name": "Yeast Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/wine+quality",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "quality",             # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "quality",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (0, 1)
@@ -505,20 +503,20 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 5,
-                "weights": 'uniform',    # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
-                "algorithm": 'auto',     # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "algorithm": 'auto',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
-    "wine-white": {                      # PORTUGUESE --> DSI, UMinho, Portugal
+    "wine-white": {  # PORTUGUESE --> DSI, UMinho, Portugal
         "name": "Yeast Data Set",
         "url": "https://archive.ics.uci.edu/ml/datasets/wine+quality",
         "header": [0],
-        "drop_cols": [],                 # columns to drop
-        "categorical_vars": None,        # None --> NO categorical (i.e., discrete) variables (i.e., features)
-        "target": "quality",             # the label of the dependent variable (i.e., feature)
+        "drop_cols": [],  # columns to drop
+        "categorical_vars": None,  # None --> NO categorical (i.e., discrete) variables (i.e., features)
+        "target": "quality",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (0, 1)
@@ -535,10 +533,10 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "class": KNeighborsClassifier,
             "kwargs": {
                 "n_neighbors": 5,
-                "weights": 'uniform',    # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
-                "algorithm": 'auto',     # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
-                "p": 2,                  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
-                "n_jobs": -1             # -1 means using all processors
+                "weights": 'uniform',  # weights: {‘uniform’, ‘distance’} or callable, default=’uniform’
+                "algorithm": 'auto',  # algorithm: {‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}, default=’auto’
+                "p": 2,  # p: int, default=2 (p = 1 --> l1, manhattan; p = 2 --> l2, euclidean)
+                "n_jobs": -1  # -1 means using all processors
             }
         }
     },
@@ -551,9 +549,13 @@ DATASETS: Dict[str, Dict[str, Any]] = {
             "erl": {
                 "class": OneHotEncoder,
                 "kwargs": {"dtype": int}
+            },
+            "pox": {
+                "class": OneHotEncoder,
+                "kwargs": {"dtype": int}
             }
         },
-        "target": "local. site",         # the label of the dependent variable (i.e., feature)
+        "target": "local. site",  # the label of the dependent variable (i.e., feature)
         "scaler": {
             "class": MinMaxScaler,
             "feature_range": (-1, 1)
@@ -578,14 +580,14 @@ def accuracy_and_auroc(
     original_transformer: DataTransformer = DataTransformer()
     imputed_transformer: DataTransformer = DataTransformer()
     original: np.ndarray = original_transformer.fit_transform(original_data.copy(), discrete_columns=discrete_columns)
-    imputed:  np.ndarray = imputed_transformer.fit_transform(imputed_data, discrete_columns=discrete_columns)
+    imputed: np.ndarray = imputed_transformer.fit_transform(imputed_data, discrete_columns=discrete_columns)
 
     model.fit(X=original, y=target)
     score_accuracy = accuracy_score(y_true=target, y_pred=model.predict(X=imputed))
     if len(np.unique(target)) > 2:  # multiclass case
         score_auroc = roc_auc_score(
             y_true=target, y_score=model.predict_proba(X=imputed), multi_class='ovr')
-    else:                           # binary case
+    else:  # binary case
         score_auroc = roc_auc_score(
             y_true=target, y_score=model.predict_proba(X=imputed)[:, 1], multi_class='ovr')
     if verbose:
@@ -642,8 +644,9 @@ def main(args: Namespace) -> None:
     algos: List[str] = [algo.strip() for algo in args.algos.split(',')]
     algos_set: Set[str] = set(['GAIN', 'SGAIN', 'WSGAIN-CP', 'WSGAIN-GP'])              # TODO: GET RID OF HARDCODED
     datasets: List[str] = [dataset.strip() for dataset in args.datasets.split(',')]
-    datasets_set: Set[str] = set(['breast', 'credit', 'eeg', 'iris', 'letter',          # TODO: GET RID OF HARDCODED
-                                  'news', 'spam', 'wine-red', 'wine-white', 'yeast'])   # TODO: GET RID OF HARDCODED
+    datasets_set: Set[str] = set(
+        ['breast', 'credit', 'eeg', 'iris', 'letter', 'mushroom_lb',  # TODO: GET RID OF HARDCODED
+         'news', 'spam', 'wine-red', 'wine-white', 'yeast'])  # TODO: GET RID OF HARDCODED
     callables: Dict[str, Callable[[Namespace, Tuple[int, int], Dict[str, Any]], np.ndarray]] = {
         'GAIN': gain, 'SGAIN': SGAIN, 'WSGAIN-CP': WSGAIN_CP, 'WSGAIN-GP': WSGAIN_GP}   # TODO: GET RID OF HARDCODED
     results: Dict[str, Dict[str, Dict[str, List[Union[np.ndarray, float]]]]]
@@ -683,12 +686,15 @@ def main(args: Namespace) -> None:
             # data, miss, mask, trgt = matrices_and_target(dataset=args.dataset, miss_rate=args.miss_rate)
             df = pd.read_csv(f"./datasets/{dataset}.csv")
             df[DATASETS[dataset]["target"]] = LabelEncoder().fit_transform(df[DATASETS[dataset]["target"]])
-            discrete_columns = [df.columns.get_loc(column_name)
-                                for column_name in list(DATASETS[dataset]['categorical_vars'].keys())]
+            discrete_columns: List = []
 
             for algo in algos:
                 t0 = time()
                 if algo in ['SGAIN', 'WSGAIN-CP', 'WSGAIN-GP']:
+                    if DATASETS[dataset]['categorical_vars']:
+                        discrete_columns = [df.columns.get_loc(column_name)
+                                            for column_name in list(DATASETS[dataset]['categorical_vars'].keys())]
+
                     imputed_data = callables[algo](
                         data=miss,
                         algo_parameters={key.strip(): value for key, value in args.__dict__.items()},
@@ -740,8 +746,8 @@ if __name__ == "__main__":
         default=128,
         type=int)
     parser.add_argument(
-        '--hint_rate',              # NOTE: the algorithms SGAIN, WSGAIN-CP, and WSGAIN-GP do NOT use this parameter,
-        help='hint probability',    # it is here just because the GAIN algorithm requires the `hint_rate` parameter
+        '--hint_rate',  # NOTE: the algorithms SGAIN, WSGAIN-CP, and WSGAIN-GP do NOT use this parameter,
+        help='hint probability',  # it is here just because the GAIN algorithm requires the `hint_rate` parameter
         default=0.9,
         type=float)
     parser.add_argument(
@@ -814,11 +820,9 @@ if __name__ == "__main__":
         '--verbose',
         help="to control verbosity",
         choices=['False', 'True'],  # `bool` type does NOT work as expected
-        default='False',            # `bool` type does NOT work as expected
-        type=str)                   # `bool` type does NOT work as expected
+        default='False',  # `bool` type does NOT work as expected
+        type=str)  # `bool` type does NOT work as expected
 
     main(args=parser.parse_args())  # rock 'n roll
 
-
 # python main.py --algos="GAIN,SGAIN,WSGAIN-CP,WSGAIN-GP" --datasets="iris,yeast" --miss_rate=0.2 --optimizer=GDA --learn_rate=0.001 --n_iterations=1000 --n_runs=3
-

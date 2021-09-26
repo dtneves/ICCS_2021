@@ -31,7 +31,8 @@ class DataTransformer:
         }
 
     def _fit_discrete(self, data: np.ndarray):
-        ohe: OneHotEncoder = OneHotEncoder(sparse=False)
+        categories: np.ndarray = [list(filter(lambda x: not np.isnan(x), np.unique(data)))]
+        ohe: OneHotEncoder = OneHotEncoder(categories=categories, sparse=False, handle_unknown='ignore')
         ohe.fit(X=data)
         categories = len(ohe.categories_[0])
 
@@ -64,7 +65,9 @@ class DataTransformer:
 
     def _transform_discrete(self, column_meta: dict, data: np.ndarray):
         encoder: OneHotEncoder = column_meta['encoder']
-        return encoder.transform(data)
+        t = encoder.transform(data)
+        t[np.where(~t.any(axis=1))[0]] = np.nan
+        return t
 
     def transform(self, data):
         values = []
