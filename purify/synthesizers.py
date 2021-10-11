@@ -104,8 +104,6 @@ import numpy as np
 
 import random
 
-from GAIN.utils import binary_sampler, rounding
-
 from purify.imputation.gain import SGAIN, WSGAIN_CP, WSGAIN_GP
 
 from typing import Any, Callable, Dict, List, Tuple
@@ -126,94 +124,18 @@ class SynSGAIN(SGAIN):
     """
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any] = {}):
         super().__init__(data=data, algo_parameters=algo_parameters)
-        # # this is NOT needed but it is here since future versions could use it
-        # self.n_samples: int = algo_parameters['n_samples'] if 'n_samples' in algo_parameters else 100
-
-    # @classmethod
-    # def _execute(cls, data: np.ndarray, algo_parameters: Dict[str, Any] = {}) -> np.ndarray:
-    #     data_miss: np.ndarray = data.copy()  # to NOT mess up with the original data
-    #     # if NOT given then 20% of missing values will be introduced per each column
-    #     miss_rate: float = algo_parameters['miss_rate'] if 'miss_rate' in algo_parameters else 0.2
-    #     verbose: bool = algo_parameters['verbose'] if 'verbose' in algo_parameters else False
-    #     n_obs: int = data_miss.shape[0]
-    #     dim: int = data_miss.shape[1]
-    #     indices: Dict[int, Tuple[int, int]] = {}
-    #     row: int
-    #     col: int
-    #     key: int = 0
-    #
-    #     for row in range(n_obs):
-    #         for col in range(dim):
-    #             indices[key] = (row, col)
-    #             key += 1
-    #     if verbose:
-    #         print()
-    #         print("purify.synthesizers.SynSGAIN :: _execute()")
-    #     # at this moment, `data_miss` is only composed by numeric data (i.e., each variable is either of integer or
-    #     # float data type), however, since missing values will be introduced, there will be a mismatch when handling
-    #     # integer variables, thus all values are casted to `float`
-    #     data_miss = data_miss.astype(dtype=float)
-    #     while indices:
-    #         indices_sample: List[int] = random.sample(
-    #             population=list(indices.keys()), k=min(int(n_obs * dim * miss_rate), len(indices)))
-    #
-    #         # remove each index in `indices_sample` from `indices` and ampute the `data` (i.e., the numpy ndarray)
-    #         for index in indices_sample:
-    #             row, col = indices.pop(index)   # remove the index
-    #             data_miss[row, col] = np.NaN    # ampute the cell mapped by the index
-    #         if verbose:
-    #             print()
-    #             print(data_miss[0:5, :])
-    #             print("...")
-    #             print(data_miss.shape)
-    #         data_miss = SynSGAIN(data=data_miss, algo_parameters=algo_parameters).execute()
-    #         if verbose:
-    #             print()
-    #             print(data_miss[0:5, :])
-    #             print("...")
-    #             print(data_miss.shape)
-    #     return data_miss
-
-    # @classmethod
-    # def sampler(cls, data: np.ndarray, algo_parameters: Dict[str, Any] = {}) -> np.ndarray:
-    #     # if NOT given then 100 samples will be generated
-    #     n_samples: int = algo_parameters['n_samples'] if 'n_samples' in algo_parameters else 100
-    #     verbose: bool = algo_parameters['verbose'] if 'verbose' in algo_parameters else False
-    #     n_obs: int = data.shape[0]
-    #     remainder: int = n_samples % n_obs
-    #     synthetic_data: np.ndarray
-    #
-    #     synthetic_data_list: List[np.ndarray] = [
-    #         SynSGAIN._execute(data=data, algo_parameters=algo_parameters) for _ in range(n_samples // n_obs)]
-    #     if remainder > 0:
-    #         random_indices: np.ndarray = np.random.choice(a=n_obs, size=remainder, replace=False)
-    #
-    #         synthetic_data_list.append(
-    #             SynSGAIN._execute(data=data, algo_parameters=algo_parameters)[random_indices, :])
-    #     synthetic_data = np.concatenate(synthetic_data_list, axis=0)
-    #     if verbose:
-    #         print()
-    #         print("purify.synthesizers.SynSGAIN :: sampler()")
-    #         print(synthetic_data[0:5, :])
-    #         print("...")
-    #         print(synthetic_data.shape)
-    #     return synthetic_data
 
 
 class SynSGAIN_CP(WSGAIN_CP):
 
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any] = {}):
         super().__init__(data=data, algo_parameters=algo_parameters)
-        # # this is NOT needed but it is here since future versions could use it
-        # self.n_samples: int = algo_parameters['n_samples'] if 'n_samples' in algo_parameters else 100
 
 
 class SynSGAIN_GP(WSGAIN_GP):
 
     def __init__(self, data: np.ndarray, algo_parameters: Dict[str, Any] = {}):
         super().__init__(data=data, algo_parameters=algo_parameters)
-        # # this is NOT needed but it is here since future versions could use it
-        # self.n_samples: int = algo_parameters['n_samples'] if 'n_samples' in algo_parameters else 100
 
 
 class Synthesizer:
@@ -316,5 +238,4 @@ class Synthesizer:
             print("...")
             print(f"shape: {synthetic_data.shape}")
         return synthetic_data
-
 
