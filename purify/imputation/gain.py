@@ -149,11 +149,32 @@ class SGAIN:
         self.momentum: float = algo_parameters['momentum'] if 'momentum' in algo_parameters else 0.000
         self.epsilon: float = algo_parameters['epsilon'] if 'epsilon' in algo_parameters else 1e-8
         self.n_iterations: int = algo_parameters['n_iterations'] if 'n_iterations' in algo_parameters else 1000
+        self.act_meta: list = algo_parameters['act_meta'] if 'act_meta' in algo_parameters else []
         self.verbose: bool = algo_parameters['verbose'] == 'True' if 'verbose' in algo_parameters else False
         # replace missing values by zero, later on these will be imputed see `impute()` method
         self.data_miss = np.nan_to_num(x=self.data_miss, nan=0.00)
         # build the Generative Adversarial Network (GAN) architecture
         self.gan_architecture()
+
+    def _apply_activations(self, x):
+        data_t = []
+        st = 0
+
+        for idx, item in enumerate(self.act_meta):
+            item = item['info']
+            if item[1] == 'tanh':
+                ed = st + item[0]
+                data_t.append(tf.keras.activations.tanh(x[:, st:ed]))
+                st = ed
+            elif item[1] == 'softmax':
+                ed = st + item[0]
+                c = tf.keras.activations.softmax(x[:, st:ed])
+                data_t.append(c)
+                st = ed
+            else:
+                assert 0
+
+        return tf.concat(data_t, axis=1)
 
     def gan_architecture(self) -> None:
         self.X: Tensor = tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, self.m_dim])  # data Tensor
@@ -218,12 +239,12 @@ class SGAIN:
     def generator(self, z: Tensor, m: Tensor) -> Tensor:
         G_h1: Tensor = tf.nn.relu(features=(tf.matmul(a=tf.concat(values=[z, m], axis=1), b=self.G_W1) + self.G_b1))
 
-        return tf.nn.tanh(x=(tf.matmul(a=G_h1, b=self.G_W2) + self.G_b2))  # returns `G_prob`, which is a Tensor
+        return self._apply_activations(x=(tf.matmul(a=G_h1, b=self.G_W2) + self.G_b2))  # returns `G_prob`, which is a Tensor
 
     def discriminator(self, x: Tensor) -> Tensor:
         D_h1: Tensor = tf.nn.relu(features=(tf.matmul(a=x, b=self.D_W1) + self.D_b1))
 
-        return tf.nn.tanh(x=(tf.matmul(a=D_h1, b=self.G_W2) + self.G_b2))  # returns `D_prob`, which is a Tensor
+        return self._apply_activations(x=(tf.matmul(a=D_h1, b=self.G_W2) + self.G_b2))  # returns `D_prob`, which is a Tensor
 
     @staticmethod
     def sample_z(n_rows: int, m_cols: int, feature_range: Tuple[float, float] = (-0.01, +0.01)) -> np.ndarray:

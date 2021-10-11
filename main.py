@@ -78,12 +78,28 @@ def iccs_2021(dataset: str = 'adult', algo: str = 'SynSGAIN', miss_rate: float =
     df_pre = PreProcessor.replace_miss_values_by_nans(df=df_pre, dataset=dataset)
     df_pre = PreProcessor.drop_nans(df=df_pre)
     # data transformation that looks like one-hot encoding
+    discrete_cols = Metadata.discrete_vars(dataset=dataset, df=df_pre)
+    act_meta = []
+    for col_name, series in df_pre.items():
+        if col_name in discrete_cols:
+            categories = len(series.unique())
+            act_meta.append({
+                "name": col_name,
+                "info": (categories, "softmax"),
+                "dims": categories
+            })
+        else:
+            act_meta.append({
+                "name": col_name,
+                "info": (1, "tanh"),
+                "dims": 1
+            })
     df_dum = get_dummies_fit_transform(
         data=df_pre, discrete_cols=Metadata.discrete_vars(dataset=dataset, df=df_pre), verbose=verbose)
     synthesizer = Synthesizer(
         data=df_dum.to_numpy(),
         algo=algo,
-        algo_parameters={'miss_rate': miss_rate, 'n_samples': n_samples, 'verbose': verbose})
+        algo_parameters={'miss_rate': miss_rate, 'n_samples': n_samples, 'act_meta': act_meta, 'verbose': verbose})
     # sampling (i.e., get the samples)
     # samples = SynSGAIN.sampler(
     #     data=df_dum.to_numpy(),
@@ -117,7 +133,7 @@ def main() -> None:
         ('adult', 30162), ('breast', 569), ('eeg', 14980), ('iris', 150), ('mushroom', 8124),
         # 5                   6                  7
         ('wine-red', 1599), ('wine-white', 4898), ('yeast', 1484)]
-    dataset_index: int = 3
+    dataset_index: int = 0
     dataset: str = datasets[dataset_index][0]
     algos: List[str] = [
         # 0           1              2
@@ -125,7 +141,7 @@ def main() -> None:
     algo_index: int = 0
     algo: str = algos[algo_index]
     n_samples: int = datasets[dataset_index][1] * 1
-    miss_rate: float = 0.50
+    miss_rate: float = 0.10
     verbose: bool = True
     df_raw: pd.DataFrame
     df_sam: pd.DataFrame
