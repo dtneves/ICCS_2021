@@ -111,7 +111,7 @@ def iccs_2021(dataset: str = 'adult', algo: str = 'SynSGAIN', miss_rate: float =
     return df_raw, df_sam
 
 
-if __name__ == "__main__":
+def main() -> None:
     datasets: List[Tuple[str, int]] = [
         # 0                 1                2               3              4
         ('adult', 30162), ('breast', 569), ('eeg', 14980), ('iris', 150), ('mushroom', 8124),
@@ -137,4 +137,8 @@ if __name__ == "__main__":
     # report_correlations(
     #     original_data=df_raw, synthetic_data=df_sam, dataset=dataset, algorithm="GenSGAIN", miss_rate=miss_rate)
     print(profiler(df=df_sam, discrete_vars=Metadata.discrete_vars(dataset=dataset, df=df_sam)))
+
+
+if __name__ == "__main__":
+    main()
 
