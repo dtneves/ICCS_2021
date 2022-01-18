@@ -8,5 +8,5 @@ The datasets are from the [University of California at Irvine (UCI) Machine Lear
 * [Letter Recognition Data Set](https://archive.ics.uci.edu/ml/datasets/Letter+Recognition)
 * [Online News Popularity Data Set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity)
 * [Spambase Data Set](https://archive.ics.uci.edu/ml/datasets/Spambase)
-* [Wine Quality Data Set](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
+* [(Red and White) Wine Quality Data Set](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
 * [Yeast Data Set](https://archive.ics.uci.edu/ml/datasets/Yeast)
